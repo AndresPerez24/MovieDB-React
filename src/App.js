@@ -1,25 +1,37 @@
-import logo from './logo.svg';
-import './App.css';
+import React from "react";
+import { useQueries } from "react-query";
+import { getMovies, getGenres } from "./moviesApi";
+import Movies from "./components/Movies/movies.jsx";
+
+import "./App.scss";
 
 function App() {
+
+  const results = useQueries([
+    { queryKey: ["movies", 1], queryFn: getMovies },
+    { queryKey: ["genres", 2], queryFn: getGenres },
+  ]);
+
+  console.log("results", results);
+
+  const isLoading = results.some((result) => result.isLoading);
+  const isError = results.some((result) => result.isError);
+
+  if (isLoading) {
+    return <div>hola max</div>;
+  }
+
+  if (isError) {
+    return <div>ERROR</div>;
+  }
+
+  const movies = results[0].data;
+  const genres = results[1].data;
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <Movies movies={movies} genres={genres} />
     </div>
   );
 }
-
 export default App;
